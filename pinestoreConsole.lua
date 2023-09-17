@@ -133,7 +133,7 @@ local function installProject(project)
 		-- set project info to installed
 		installedInfo.projects[tostring(project.id)] = project
 		saveInstalled()
-		postAPI("newdownload", { projectId = project.id })
+		-- postAPI("newdownload", { projectId = project.id })
 	else
 		error(res)
 	end
