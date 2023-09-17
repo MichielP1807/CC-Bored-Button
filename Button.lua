@@ -210,8 +210,16 @@ local function presentButton()
   return pleaseStartFunNowThanks
 end
 
+
+local lastProjectIndex
 local function startFun()
-  local project = PineStore.funProjects[math.random(#PineStore.funProjects)]
+  local projectIndex = math.random(#PineStore.funProjects)
+  while projectIndex == lastProjectIndex do
+    projectIndex = math.random(#PineStore.funProjects)
+  end
+  lastProjectIndex = projectIndex
+
+  local project = PineStore.funProjects[projectIndex]
 
   local installed = PineStore.installedInfo.projects[tostring(project.id)]
 
