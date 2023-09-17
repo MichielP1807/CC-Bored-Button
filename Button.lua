@@ -232,6 +232,3 @@ local function main()
   end
 end
 main()
-
--- Ideas:
--- Cycle color palletes after restart?

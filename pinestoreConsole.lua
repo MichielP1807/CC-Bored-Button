@@ -1,14 +1,14 @@
 -- PineStore Console Edition by Xella
 -- Modified by Michiel
 
-local apiPath = "https://pinestore.cc/api/"
+local THE_BUTTON_PROJECT_ID = 8
 
 local installDir = "installed"
-
 if not fs.exists(installDir) then
 	fs.makeDir(installDir)
 end
 
+local apiPath = "https://pinestore.cc/api/"
 local function getAPI(path)
 	local res = http.get(apiPath .. path)
 	if not res then
@@ -30,9 +30,7 @@ function postAPI(path, body)
 	return textutils.unserialiseJSON(data)
 end
 
-local installedInfo = {
-	projects = {},
-}
+local installedInfo = { projects = {} }
 if fs.exists("installed.json") then
 	local h = fs.open("installed.json", "r")
 	installedInfo = textutils.unserialiseJSON(h.readAll())
@@ -49,14 +47,14 @@ end
 -- Get projects from API
 local projects = getAPI("projects").projects
 if not projects then
-	-- Could not load projects, load from installedInfo instead
+	-- could not load projects, load from installedInfo instead
 	local ps = {}
 	for id, project in pairs(installedInfo.projects) do
 		ps[#ps + 1] = project
 	end
 	projects = ps
 else
-	-- Add projects to installedInfo
+	-- add projects to installedInfo
 	for i = 1, #projects do
 		local project = projects[i]
 		if installedInfo.projects[tostring(project.id)] then
@@ -69,17 +67,17 @@ end
 -- Remove projects without install command or target file
 for i = #projects, 1, -1 do
 	local project = projects[i]
-	if not project.install_command or not project.target_file then
+	if not project.install_command or not project.target_file or project.id == THE_BUTTON_PROJECT_ID then
 		table.remove(projects, i)
 	end
 end
 
 
--- Sort fun projects
+-- Collect fun projects (but not the button itself)
 local funProjects = {}
 for i = 1, #projects do
 	local project = projects[i]
-	if project.category == "fun" then
+	if project.category == "fun" and project.id ~= THE_BUTTON_PROJECT_ID then
 		funProjects[#funProjects + 1] = project
 	end
 end
@@ -87,9 +85,6 @@ end
 
 
 local function installProject(project)
-	-- redirect term to old one
-	-- term.redirect(oldTerm)
-
 	-- override fs methods
 	local projectPath = installDir .. "/" .. project.id .. "/"
 	fs.makeDir(projectPath)
@@ -97,8 +92,6 @@ local function installProject(project)
 	local oldFSMakeDir = fs.makeDir
 	local oldFSExists = fs.exists
 	function fs.open(path, mode)
-		-- print("open " .. path)
-		-- sleep(0.5)
 		if path:sub(1, 12) == "rom/programs" then
 			return oldFSOpen(path, mode)
 		end
@@ -119,21 +112,16 @@ local function installProject(project)
 	-- actually run the install command
 	local success, res = xpcall(shell.run, debug.traceback, project.install_command)
 
-	-- return old fs methods
+	-- reset old fs methods
 	fs.open = oldFSOpen
 	fs.makeDir = oldFSMakeDir
 	fs.exists = oldFSExists
-
-	-- use render window again
-	-- oldTerm = term.redirect(renderWindow)
-
-	-- updateTermSize()
 
 	if success then
 		-- set project info to installed
 		installedInfo.projects[tostring(project.id)] = project
 		saveInstalled()
-		-- postAPI("newdownload", { projectId = project.id })
+		-- postAPI("newdownload", { projectId = project.id }) -- don't register download
 	else
 		error(res)
 	end
@@ -165,7 +153,7 @@ local function startProject(project)
 		return oldFSList(projectPath .. path)
 	end
 
-	-- term.redirect(oldTerm)
+	-- run project
 	local success, res = xpcall(function()
 		local success = shell.run(project.target_file)
 
@@ -177,7 +165,7 @@ local function startProject(project)
 		end
 	end, debug.traceback)
 
-	-- return old fs methods
+	-- reset old fs methods
 	fs.open = oldFSOpen
 	fs.makeDir = oldFSMakeDir
 	fs.exists = oldFSExists
