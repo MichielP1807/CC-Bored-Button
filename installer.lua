@@ -4,7 +4,7 @@ local FOLDERS = {}
 local DOWNLOADS = {
     "Button.lua",
     "betterblittle.lua",
-    "Pine3d.lua",
+    "Pine3D.lua",
     "pinestoreConsole.lua",
     "button.stab",
     "button_base.stab"
