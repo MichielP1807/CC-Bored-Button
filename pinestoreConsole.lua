@@ -77,7 +77,7 @@ end
 local funProjects = {}
 for i = 1, #projects do
 	local project = projects[i]
-	if project.id ~= THE_BUTTON_PROJECT_ID then
+	if project.id ~= THE_BUTTON_PROJECT_ID and project.tags then
 		for tag in project.tags:gmatch("[^,]+") do
 			if tag == "fun" then
 				funProjects[#funProjects + 1] = project
