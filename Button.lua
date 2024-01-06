@@ -100,7 +100,7 @@ local function presentButton()
   local background = frame:newObject(backgroundModel, 2, -1.2, 0, 0, 0, -TAU / 8)
   local button = frame:newObject("button.stab", 0, 0, 0, 0, TAU / 8, 0)
   local button_base = frame:newObject("button_base.stab", 0, 0, 0, 0, TAU / 8, 0)
-  local objects = { button, button_base, background }
+  local objects = {button, button_base, background}
 
   local is_hovered = false      -- when user's cursor hovers over the button
   local is_pressed = false      -- when user is pressing the button
@@ -223,7 +223,7 @@ local function startFun()
 
   local installed = PineStore.installedInfo.projects[tostring(project.id)]
 
-  if not installed or project.version > installed.version then
+  if not installed or project.date_updated > installed.date_updated then
     PineStore.installProject(project)
   end
   PineStore.startProject(project)

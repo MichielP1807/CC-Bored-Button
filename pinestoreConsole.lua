@@ -21,7 +21,7 @@ local function getAPI(path)
 end
 
 function postAPI(path, body)
-	local res = http.post(apiPath .. path, textutils.serialiseJSON(body), { ["Content-Type"] = "application/json" })
+	local res = http.post(apiPath .. path, textutils.serialiseJSON(body), {["Content-Type"] = "application/json"})
 	if not res then
 		return
 	end
@@ -30,7 +30,7 @@ function postAPI(path, body)
 	return textutils.unserialiseJSON(data)
 end
 
-local installedInfo = { projects = {} }
+local installedInfo = {projects = {}}
 if fs.exists("installed.json") then
 	local h = fs.open("installed.json", "r")
 	installedInfo = textutils.unserialiseJSON(h.readAll())
@@ -78,8 +78,8 @@ local funProjects = {}
 for i = 1, #projects do
 	local project = projects[i]
 	if project.id ~= THE_BUTTON_PROJECT_ID then
-		for tag in project.tags:gmatch("[^,]+") do
-			if tag == "fun" then
+		for t = 1, #project.tags do
+			if project.tags[t] == "fun" then
 				funProjects[#funProjects + 1] = project
 			end
 		end
