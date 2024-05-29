@@ -77,13 +77,15 @@ end
 local funProjects = {}
 for i = 1, #projects do
 	local project = projects[i]
+	local accept = false
+	local block = false
 	if project.id ~= THE_BUTTON_PROJECT_ID and project.tags then
 		for t = 1, #project.tags do
-			if project.tags[t] == "fun" then
-				funProjects[#funProjects + 1] = project
-			end
+			if project.tags[t] == "fun" then accept = true end
+			if project.tags[t] == "utility" then block = true end
 		end
 	end
+	if accept and not block then funProjects[#funProjects + 1] = project end
 end
 
 
